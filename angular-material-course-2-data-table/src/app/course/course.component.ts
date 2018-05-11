@@ -6,6 +6,7 @@ import {CoursesService} from '../services/courses.service';
 import {debounceTime, distinctUntilChanged, startWith, tap, timeout} from 'rxjs/operators';
 import {merge} from 'rxjs/observable/merge';
 import {fromEvent} from 'rxjs/observable/fromEvent';
+import { LessonsDataSource } from '../services/lessons.datasource';
 
 
 @Component({
@@ -16,7 +17,11 @@ import {fromEvent} from 'rxjs/observable/fromEvent';
 export class CourseComponent implements OnInit, AfterViewInit {
 
     course: Course;
-    dataSource = new MatTableDataSource([]);
+
+    // Local Datasource to populate the material datatable
+    // dataSource = new MatTableDataSource([]);
+
+    dataSource: LessonsDataSource;
     displayedColumns = ['seqNo', 'description', 'duration'];
 
     constructor(private route: ActivatedRoute,
@@ -28,15 +33,21 @@ export class CourseComponent implements OnInit, AfterViewInit {
 
         this.course = this.route.snapshot.data['course'];
 
-        this.coursesService.findAllCourseLessons(this.course.id).subscribe(lessons => this.dataSource.data = lessons);
+        // Component to initalize the datasource
+        // this.coursesService.findAllCourseLessons(this.course.id).subscribe(lessons => this.dataSource.data = lessons);
+
+        this.dataSource = new LessonsDataSource(this.coursesService);
+
+        this.dataSource.loadLessons(this.course.id, 'hello', 'asc', 0, 3);
+
     }
 
     ngAfterViewInit() {
 
     }
 
-    searchLessons(search = '') {
+    /*searchLessons(search = '') {
         this.dataSource.filter = search.toLocaleLowerCase().trim();
-    }
+    }*/
 
 }
