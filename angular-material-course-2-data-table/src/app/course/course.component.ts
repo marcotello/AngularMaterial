@@ -35,5 +35,8 @@ export class CourseComponent implements OnInit, AfterViewInit {
 
     }
 
+    searchLessons(search = '') {
+        this.dataSource.filter = search.toLocaleLowerCase().trim();
+    }
 
 }
