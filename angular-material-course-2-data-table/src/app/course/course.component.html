@@ -8,6 +8,10 @@
         <input matInput placeholder="Search Lessons" #input>
     </mat-input-container>
 
+    <div class="spinner-container" *ngIf="dataSource.loading$ | async">
+        <mat-spinner></mat-spinner>
+    </div>
+
     <mat-table class="lessons-table mat-elevation-z8" [dataSource]="dataSource">
         <ng-container matColumnDef="seqNo">
             <mat-header-cell *matHeaderCellDef>#</mat-header-cell>
@@ -26,6 +30,8 @@
 
         <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
     </mat-table>
+
+    <mat-paginator [length]="course?.lessonsCount" [pageSize]="3" [pageSizeOptions]="[3, 5, 10]"></mat-paginator>
 </div>
 
 
