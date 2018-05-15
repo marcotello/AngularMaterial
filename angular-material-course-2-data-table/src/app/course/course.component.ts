@@ -26,6 +26,10 @@ export class CourseComponent implements OnInit, AfterViewInit {
 
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
+    @ViewChild(MatSort) sort: MatSort;
+
+    @ViewChild('input') input: ElementRef;
+
     constructor(private route: ActivatedRoute,
                 private coursesService: CoursesService) {
 
@@ -40,14 +44,34 @@ export class CourseComponent implements OnInit, AfterViewInit {
 
         this.dataSource = new LessonsDataSource(this.coursesService);
 
-        this.dataSource.loadLessons(this.course.id, '', 'asc', 0, 3);
+        this.dataSource.loadLessons(this.course.id, '', this.sort.direction, 0, 3);
 
     }
 
     ngAfterViewInit() {
-        this.paginator.page.pipe(startWith(null), tap(() => {
-            this.dataSource.loadLessons(this.course.id, '', 'asc', this.paginator.pageIndex, this.paginator.pageSize);
-        })).subscribe();
+
+        fromEvent(this.input.nativeElement, 'keyup').pipe(
+            debounceTime(150),
+            distinctUntilChanged(),
+            tap(() => {
+                this.paginator.pageIndex = 0;
+                this.loadLessonsPage();
+            })
+        ).subscribe();
+
+        this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+
+        merge(this.sort.sortChange, this.paginator.page).pipe(startWith(null), tap(() => this.loadLessonsPage())).subscribe();
+    }
+
+    loadLessonsPage() {
+        this.dataSource.loadLessons(
+            this.course.id,
+            this.input.nativeElement.value,
+            this.sort.direction,
+            this.paginator.pageIndex,
+            this.paginator.pageSize
+        );
     }
 
     /*searchLessons(search = '') {
